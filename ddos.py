@@ -1,30 +1,30 @@
 import threading
 import socket
+import time
 
 def send_socket(server_address):
-    # Création d'un socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    # Connexion au serveur
-    sock.connect(server_address)
+    sock.settimeout(10)
+    try:
+        sock.connect(server_address)
+    except Exception as e:
+        print(f"Erreur de connexion : {e}")
+        return
 
     while True:
         try:
-            # Envoi de données au serveur
-            message = b'This is the message.  It will be repeated.'
+            message = b'This is the message. It will be repeated.'
             sock.sendall(message)
-
-            # Réception de la réponse du serveur
             data = sock.recv(1024)
-        except:
-            # Fermeture du socket en cas d'erreur
+            print(repr(data))
+            #time.sleep(1)  # Ajout d'un délai
+        except Exception as e:
+            print(f"Erreur durant l'envoi ou la réception : {e}")
             sock.close()
             break
 
-        print(repr(data))
+server_address = ('176.181.225.177', 5173)
 
-# Création de plusieurs threads pour envoyer des sockets simultanément
-server_address = ('IP_ADDRESS', PORT)
-for i in range(5):
+for i in range(4096):
     t = threading.Thread(target=send_socket, args=(server_address,))
     t.start()
